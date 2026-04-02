@@ -610,6 +610,33 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         -- ts_ls = {},
+        --
+
+        pylsp = {
+          settings = {
+            pylsp = {
+              plugins = {
+                -- Disable these so Ruff can take over
+                pycodestyle = { enabled = false },
+                flake8 = { enabled = false },
+                mccabe = { enabled = false },
+                pyflakes = { enabled = false },
+                autopep8 = { enabled = false },
+                yapf = { enabled = false },
+                pylsp_mypy = { enabled = false },
+                pylsp_black = { enabled = false },
+                pylsp_isort = { enabled = false },
+              },
+            },
+          },
+        },
+
+        ruff = {
+          on_attach = function(client)
+            -- Disable hover in favor of Pyright's more detailed hover
+            client.server_capabilities.hoverProvider = false
+          end,
+        },
 
         stylua = {}, -- Used to format Lua code
 
@@ -697,7 +724,11 @@ require('lazy').setup({
       formatters_by_ft = {
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
+        python = {
+          'ruff_fix', -- Fixes lint errors (like unused imports)
+          'ruff_format', -- Formats the code style
+          'ruff_organize_imports', -- Sorts the imports
+        },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
         -- javascript = { "prettierd", "prettier", stop_after_first = true },
@@ -929,18 +960,18 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the Kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-  -- require 'kickstart.plugins.debug',
+  require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
   -- require 'kickstart.plugins.autopairs',
-  -- require 'kickstart.plugins.neo-tree',
+  require 'kickstart.plugins.neo-tree',
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommended keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
   --
   -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
   -- Or use telescope!
